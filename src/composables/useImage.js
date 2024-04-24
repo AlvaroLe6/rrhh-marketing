@@ -6,7 +6,7 @@ import { uid } from 'uid'
 export default function useImage() {
 
     const storage = useFirebaseStorage()
-    const storageRefPath = storageRef(storage, `/contabilidad_rc/${uid()}.jpg`)
+    const storageRefPath = storageRef(storage, `/re_applicants/${uid()}.jpg`)
 
     const {
         url,

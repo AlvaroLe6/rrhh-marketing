@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore';
 
   const firebaseConfig = {
-    apiKey: "AIzaSyAfeH05JqpuOPjcNulWrfSegqx_sVlPHzY",
-    authDomain: "contabilidad-e77a2.firebaseapp.com",
-    projectId: "contabilidad-e77a2",
-    storageBucket: "contabilidad-e77a2.appspot.com",
-    messagingSenderId: "172175111817",
-    appId: "1:172175111817:web:37fe304cd55b68fabaf858"
+  apiKey: "AIzaSyDnZ9kkrFq4gnIEj3OskVyao3OsJG_2oYo",
+  authDomain: "marketing-rrhh.firebaseapp.com",
+  projectId: "marketing-rrhh",
+  storageBucket: "marketing-rrhh.appspot.com",
+  messagingSenderId: "694821702939",
+  appId: "1:694821702939:web:47c1e53a883e3a2bdc97be"
   };  
 
 export const firebaseApp = initializeApp(firebaseConfig)

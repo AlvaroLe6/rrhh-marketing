@@ -7,7 +7,7 @@ import { db } from '@/config/firebase';
 export default  function useContabilidad(){
 
     const database = useFirestore()
-    const contabilidadCollection = useCollection(collection(db, 'contabilidad_rc'));
+    const contabilidadCollection = useCollection(collection(db, 're_applicants'));
     const dialog = ref(false);
     const dialogDelete = ref(false);
     const editedItem = ref(null);
@@ -18,7 +18,7 @@ const contabilidadFecha = ref([]);
 
 onMounted(() => {
   const limpComponente = onSnapshot(
-    collection(db, 'contabilidad_rc'),
+    collection(db, 're_applicants'),
     (querySnapshot) => {
       const docs = querySnapshot.docs.map(doc => {
         const data = doc.data();
@@ -86,7 +86,7 @@ const deleteItemConfirm = async () => {
   if (editedIndex.value > -1) {
     try {
       // Actualiza el campo 'estado'
-      const itemRef = doc(db, 'contabilidad_rc', contabilidadFecha.value[editedIndex.value].id);
+      const itemRef = doc(db, 're_applicants', contabilidadFecha.value[editedIndex.value].id);
       await updateDoc(itemRef, { estado: false });
 
       // Opcionalmente, actualiza el estado localmente para reflejar el cambio inmediatamente en la UI.
@@ -121,7 +121,7 @@ const save = async () => {
 
     // Actualiza el documento en Firestore con el objeto Timestamp
     try {
-      const itemRef = doc(db, 'contabilidad_rc', contabilidadFecha.value[editedIndex.value].id);
+      const itemRef = doc(db, 're_applicants', contabilidadFecha.value[editedIndex.value].id);
       await updateDoc(itemRef, updatedData);
       console.log("Documento actualizado con éxito");
       dialog.value = false;
