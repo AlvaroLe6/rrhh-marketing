@@ -22,6 +22,13 @@ const router = createRouter({
       name: 'register',
       component: () => import('../views/RegisterView.vue')
     },
+    {
+      path: '/nuevo',
+      name: 'nuevo-re-contabilidad',
+      component: () => import('../views/admin/NuevoRegContabilidadView.vue'),
+     
+
+    },
 
     {
       path: '/admin',

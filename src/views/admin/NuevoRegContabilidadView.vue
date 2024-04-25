@@ -81,7 +81,8 @@ const submit = handleSubmit(async (values) => {
     
 
 <template>
-  <v-card 
+  <v-card
+    elevation="3" 
     max-width="800" flat class="card mx-auto my-10">
     <v-card-title class="text-h4 font-weight-bold" tag="h3">
       Formulario
@@ -220,9 +221,11 @@ const submit = handleSubmit(async (values) => {
 <style>
 .card
 {
-     border: black;
-     border-left:10px; 
-     border-right:10px;
+
+     border-right: solid;
+     border-width: solid;
+     color: #cdcdcd;
+     
 }
 .text-h4
 {
