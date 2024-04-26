@@ -1,6 +1,6 @@
 export const validationSchema = {
-    detalle (value) {
-      if (value?.length >= 4 ) return true
+    nombre (value) {
+      if (value?.length >= 1 ) return true
       return 'El titulo del Libro es obligatorio o muy corto'
     },
   

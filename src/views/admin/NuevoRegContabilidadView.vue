@@ -3,19 +3,19 @@ import { useForm, useField } from "vee-validate";
 import { collection, setDoc, getDocs, doc } from "firebase/firestore";
 import { useFirestore } from "vuefire";
 import { useRouter } from "vue-router";
-import {
-  validationSchema,
-  imageSchema,
-} from "@/validation/contabilidadSchema.js";
+import { validationSchema, imageSchema} from "@/validation/contabilidadSchema.js";
 import useImage from "@/composables/useImage";
 import { ref } from "vue";
 
 const fechaFin = ref(new Date().toISOString().substr(0, 10));
 const db = useFirestore();
 const router = useRouter();
-const textoCancelar = "Cancelar";
-const textoSeleccionar = "Seleccionar";
 
+const snackbar = ref(false);
+const snackbarMessage = ref('');
+
+
+console.log("fechaFin",fechaFin.value)
 const { handleSubmit } = useForm({
   validationSchema: {
     ...validationSchema,
@@ -33,10 +33,12 @@ const celular = useField("celular");
 const edad = useField("edad");
 const profesion = useField("profesion");
 const comtExpArea = useField("comtExpArea");
+const ciudadR = useField("ciudadR");
 const imagen = useField("imagen");
 
+
 const submit = handleSubmit(async (values) => {
-  const { imagen, ...contabilidad_rc } = values;
+  const { imagen, ...re_applicants } = values;
 
   let originalId = "COD-RP-";
   let contador = 1;
@@ -62,7 +64,7 @@ const submit = handleSubmit(async (values) => {
     const docRef = await setDoc(
       doc(collection(db, "re_applicants"), generatedId),
       {
-        ...contabilidad_rc,
+        ...re_applicants,
         image: url.value,
         idRegCaja: generatedId,
         fecha: fechaFin.value,
@@ -70,11 +72,18 @@ const submit = handleSubmit(async (values) => {
       }
     );
     console.log("Documento guardado correctamente.");
-
+    snackbar.value = true;
+  snackbarMessage.value = 'Tu solicitud ha sido guardada exitosamente.';
+  
     // Redirige al usuario a la lista de registros
-    router.push({ name: "admin-list-contabilidad" });
-  } catch (error) {
+    setTimeout(() => {
+    router.push({ name: 'home' });
+  }, 2000); // Muestra el snackbar por 2 segundos antes de redirigir
+} catch (error) {
     console.error("Error al guardar el documento en Firestore:", error);
+    snackbar.value = true;
+  snackbarMessage.value = 'Error al guardar el documento. Por favor, intenta de nuevo.';
+
   }
 });
 </script>
@@ -84,6 +93,14 @@ const submit = handleSubmit(async (values) => {
   <v-card
     elevation="3" 
     max-width="800" flat class="card mx-auto my-10">
+    <v-snackbar v-model="snackbar">
+  {{ snackbarMessage }}
+  <template v-slot:action="{ attrs }">
+    <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+      Cerrar
+    </v-btn>
+  </template>
+</v-snackbar>
     <v-card-title class="text-h4 font-weight-bold" tag="h3">
       Formulario
     </v-card-title>
@@ -167,6 +184,17 @@ const submit = handleSubmit(async (values) => {
                     persistent-hint
                   ></v-text-field>
                 </v-col>
+
+                 <!-- Ciudad de recidencia -->
+                 <v-col md="6" cols="12">
+                  <v-text-field
+                    v-model="ciudadR.value.value"
+                    label="Ciudad de recidencia"
+                    variant="outlined"
+                    persistent-hint
+                  ></v-text-field>
+                </v-col>
+
                 <!-- Coméntanos tu experiencia en el área -->
                 <v-col md="12" cols="12">
                   <v-textarea
@@ -200,7 +228,7 @@ const submit = handleSubmit(async (values) => {
                 <!-- Acciones del Formulario -->
                 <v-col cols="12" class="d-flex flex-wrap gap-4">
                   <VBtn @click="submit">Guardar</VBtn>
-
+                  
                   <VBtn
                     color="secondary"
                     variant="outlined"

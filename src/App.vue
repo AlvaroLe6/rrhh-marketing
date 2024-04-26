@@ -10,7 +10,7 @@ const auth = useAuthStore();
   <v-app>
     <v-app-bar app color="#162D4B" class="app-bar">
       <div class="nav-container">
-        <router-link :to="{ name: 'login' }" class="logo-link">
+        <router-link :to="{ name: 'home' }" class="logo-link">
           <img
             src="@/assets/ESCUELA DE NEGOCIOS_HORIZONTAL BLANCO.png"
             alt="Logo"
@@ -34,8 +34,13 @@ const auth = useAuthStore();
         </div>
           <UserProfile v-if="auth.isAuth" />
         <div v-else>
-          <v-btn class="btn-apply"  :to="{ name: 'login' }"> Postulate </v-btn>
-          <v-btn  :to="{ name: 'login' }"> Iniciar Sesión </v-btn>
+          <v-btn 
+          color="teal-lighten-3"
+          prepend-icon="mdi-check-circle"
+          variant="outlined"
+          class="btn-apply"  :to="{ name: 'nuevo-re-contabilidad' }"> Postulate </v-btn>
+          <v-btn
+          :to="{ name: 'login' }"> Iniciar Sesión </v-btn>
          
         </div>
         </div>
@@ -84,8 +89,6 @@ export default {
 .logo-link {
   margin-right: 1rem; /* Ajusta esto para el espacio después del logo */
 }
-.btn-apply
-{
-color:#FF5733 ;}
+
 
 </style>
