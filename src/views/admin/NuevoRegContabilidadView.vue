@@ -3,7 +3,10 @@ import { useForm, useField } from "vee-validate";
 import { collection, setDoc, getDocs, doc } from "firebase/firestore";
 import { useFirestore } from "vuefire";
 import { useRouter } from "vue-router";
-import { validationSchema, imageSchema} from "@/validation/contabilidadSchema.js";
+import {
+  validationSchema,
+  imageSchema,
+} from "@/validation/contabilidadSchema.js";
 import useImage from "@/composables/useImage";
 import { ref } from "vue";
 
@@ -12,10 +15,9 @@ const db = useFirestore();
 const router = useRouter();
 
 const snackbar = ref(false);
-const snackbarMessage = ref('');
+const snackbarMessage = ref("");
 
-
-console.log("fechaFin",fechaFin.value)
+console.log("fechaFin", fechaFin.value);
 const { handleSubmit } = useForm({
   validationSchema: {
     ...validationSchema,
@@ -34,8 +36,18 @@ const edad = useField("edad");
 const profesion = useField("profesion");
 const comtExpArea = useField("comtExpArea");
 const ciudadR = useField("ciudadR");
+const ciudades = ["Cobija",
+                  "Cochabamba",
+                  "El Alto",
+                  "La Paz",
+                  "Oruro",
+                  "Potosí",
+                  "Santa Cruz de la Sierra",
+                  "Sucre",
+                  "Tarija",
+                  "Trinidad",
+                      ];
 const imagen = useField("imagen");
-
 
 const submit = handleSubmit(async (values) => {
   const { imagen, ...re_applicants } = values;
@@ -73,34 +85,37 @@ const submit = handleSubmit(async (values) => {
     );
     console.log("Documento guardado correctamente.");
     snackbar.value = true;
-  snackbarMessage.value = 'Tu solicitud ha sido guardada exitosamente.';
-  
+    snackbarMessage.value = "Tu solicitud ha sido guardada exitosamente.";
+
     // Redirige al usuario a la lista de registros
     setTimeout(() => {
-    router.push({ name: 'home' });
-  }, 2000); // Muestra el snackbar por 2 segundos antes de redirigir
-} catch (error) {
+      router.push({ name: "home" });
+    }, 2000); // Muestra el snackbar por 2 segundos antes de redirigir
+  } catch (error) {
     console.error("Error al guardar el documento en Firestore:", error);
     snackbar.value = true;
-  snackbarMessage.value = 'Error al guardar el documento. Por favor, intenta de nuevo.';
-
+    snackbarMessage.value =
+      "Error al guardar el documento. Por favor, intenta de nuevo.";
   }
 });
 </script>
     
 
 <template>
-  <v-card
-    elevation="3" 
-    max-width="800" flat class="card mx-auto my-10">
-    <v-snackbar v-model="snackbar">
-  {{ snackbarMessage }}
-  <template v-slot:action="{ attrs }">
-    <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
-      Cerrar
-    </v-btn>
-  </template>
-</v-snackbar>
+
+  <v-card elevation="3" max-width="800" flat class="card mx-auto my-10">
+    <v-snackbar 
+    v-model="snackbar"
+    top
+    right
+    color="green"
+    :timeout = "3000"
+    >
+      {{ snackbarMessage }}
+        <v-btn color="white" text @click="snackbar = false">
+          Cerrar
+        </v-btn>
+    </v-snackbar>
     <v-card-title class="text-h4 font-weight-bold" tag="h3">
       Formulario
     </v-card-title>
@@ -145,8 +160,8 @@ const submit = handleSubmit(async (values) => {
                     persistent-hint
                   ></v-text-field>
                 </v-col>
-                 <!-- Correo electrónico -->
-                 <v-col md="6" cols="12">
+                <!-- Correo electrónico -->
+                <v-col md="6" cols="12">
                   <v-text-field
                     v-model="email.value.value"
                     label="Correo electrónico"
@@ -185,14 +200,16 @@ const submit = handleSubmit(async (values) => {
                   ></v-text-field>
                 </v-col>
 
-                 <!-- Ciudad de recidencia -->
-                 <v-col md="6" cols="12">
-                  <v-text-field
-                    v-model="ciudadR.value.value"
-                    label="Ciudad de recidencia"
-                    variant="outlined"
-                    persistent-hint
-                  ></v-text-field>
+                <!-- Ciudad de recidencia -->
+                <v-col md="6" cols="12">
+                  <v-select
+                  v-model="ciudadR.value.value"
+                  label="Ciudad de recidencia"
+                  :items="ciudades" 
+                  outlined
+                  variant="outlined"
+                  persistent-hint
+                  ></v-select>
                 </v-col>
 
                 <!-- Coméntanos tu experiencia en el área -->
@@ -228,7 +245,7 @@ const submit = handleSubmit(async (values) => {
                 <!-- Acciones del Formulario -->
                 <v-col cols="12" class="d-flex flex-wrap gap-4">
                   <VBtn @click="submit">Guardar</VBtn>
-                  
+
                   <VBtn
                     color="secondary"
                     variant="outlined"
@@ -247,18 +264,14 @@ const submit = handleSubmit(async (values) => {
   </v-card>
 </template>
 <style>
-.card
-{
-
-     border-right: solid;
-     border-width: solid;
-     color: #cdcdcd;
-     
+.card {
+  border-right: solid;
+  border-width: solid;
+  color: #cdcdcd;
 }
-.text-h4
-{
-     background-color:#7A9CC6;
-     color: white;
+.text-h4 {
+  background-color: #7a9cc6;
+  color: white;
 }
 </style>
 
