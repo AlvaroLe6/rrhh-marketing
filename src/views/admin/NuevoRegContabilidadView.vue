@@ -45,8 +45,8 @@ const ciudades = ["Cobija",
                   "Santa Cruz de la Sierra",
                   "Sucre",
                   "Tarija",
-                  "Trinidad",
-                      ];
+                  "Trinidad"];
+
 const imagen = useField("imagen");
 
 const submit = handleSubmit(async (values) => {
@@ -222,7 +222,7 @@ const submit = handleSubmit(async (values) => {
                   ></v-textarea>
                 </v-col>
 
-                <!-- Columna de la imagen -->
+                <!-- Columna subida de documentos -->
                 <v-col cols="12" md="4">
                   <v-file-input
                     variant="outlined"
