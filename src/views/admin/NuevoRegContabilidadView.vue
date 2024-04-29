@@ -3,7 +3,7 @@ import { useForm, useField } from "vee-validate";
 import { collection, setDoc, getDocs, doc } from "firebase/firestore";
 import { useFirestore } from "vuefire";
 import { useRouter } from "vue-router";
-import { validationSchema, fileSchema} from "@/validation/rrhh-mktSchema.js";
+import { validationSchema, fileSchema } from "@/validation/rrhh-mktSchema.js";
 import useFileUpload from "@/composables/useFileUpload";
 import { ref } from "vue";
 
@@ -33,19 +33,32 @@ const edad = useField("edad");
 const profesion = useField("profesion");
 const comtExpArea = useField("comtExpArea");
 const ciudadR = useField("ciudadR");
-const ciudades = ["Cobija",
-                  "Cochabamba",
-                  "El Alto",
-                  "La Paz",
-                  "Oruro",
-                  "Potosí",
-                  "Santa Cruz de la Sierra",
-                  "Sucre",
-                  "Tarija",
-                  "Trinidad"];
+const ciudades = [
+  "Cobija",
+  "Cochabamba",
+  "El Alto",
+  "La Paz",
+  "Oruro",
+  "Potosí",
+  "Santa Cruz de la Sierra",
+  "Sucre",
+  "Tarija",
+  "Trinidad",
+];
 
 const files = useField("files");
+const pretensionSal = useField("pretensionSal");
+const cuentasComp = useField("cuentasComp");
+const cuentasCompItem = ["Si", "No"];
 
+const cuentasInt = useField("cuentasInt");
+const cuentasIntItem = ["Si", "No"];
+// <!-- Tu tarjeta de debito esta habilitada para compras por internet -->
+const detalleTarjeta = useField("detalleTarjeta");
+const detalleTarjetaItem = ["Si", "No", "No cuento con tarjeta de debito"];
+//  <!-- Sabes lanzar campañas pagadas en facebook -->
+const detalleFacebook = useField("detalleFacebook");
+const detalleFacebookItem = ["Si", "No"];
 const submit = handleSubmit(async (values) => {
   const { files, ...re_applicants } = values;
 
@@ -70,11 +83,11 @@ const submit = handleSubmit(async (values) => {
   };
   let generatedId = generateNewId();
 
-  const fileChangeEvent = files.value; 
+  const fileChangeEvent = files.value;
 
   try {
-   // Espera a que la carga del archivo se complete
-   const fileUrl = await uploadFile(fileChangeEvent); // Asegúrate de pasar el evento de cambio del archivo aquí
+    // Espera a que la carga del archivo se complete
+    const fileUrl = await uploadFile(fileChangeEvent); // Asegúrate de pasar el evento de cambio del archivo aquí
     const generatedId = generateNewId();
 
     const docRef = await setDoc(
@@ -101,25 +114,15 @@ const submit = handleSubmit(async (values) => {
     snackbarMessage.value =
       "Error al guardar el documento. Por favor, intenta de nuevo.";
   }
-
 });
 </script>
     
 
 <template>
-
   <v-card elevation="3" max-width="800" flat class="card mx-auto my-10">
-    <v-snackbar 
-    v-model="snackbar"
-    top
-    right
-    color="green"
-    :timeout = "3000"
-    >
+    <v-snackbar v-model="snackbar" top right color="green" :timeout="3000">
       {{ snackbarMessage }}
-        <v-btn color="white" text @click="snackbar = false">
-          Cerrar
-        </v-btn>
+      <v-btn color="white" text @click="snackbar = false"> Cerrar </v-btn>
     </v-snackbar>
     <v-card-title class="text-h4 font-weight-bold" tag="h3">
       Formulario
@@ -215,13 +218,73 @@ const submit = handleSubmit(async (values) => {
                 <!-- Ciudad de recidencia -->
                 <v-col md="6" cols="12">
                   <v-select
-                  v-model="ciudadR.value.value"
-                  label="Ciudad de recidencia"
-                  :items="ciudades" 
-                  outlined
-                  variant="outlined"
-                  persistent-hint
-                  :error-messages="ciudadR.errorMessage.value"
+                    v-model="ciudadR.value.value"
+                    label="Ciudad de recidencia"
+                    :items="ciudades"
+                    outlined
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="ciudadR.errorMessage.value"
+                  ></v-select>
+                </v-col>
+
+                <!-- Pretensión salarial -->
+                <v-col md="6" cols="12">
+                  <v-text-field
+                    v-model="pretensionSal.value.value"
+                    label="Pretensión salarial"
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="profesion.errorMessage.value"
+                  ></v-text-field>
+                </v-col>
+                <!-- Cuentas con una computadora  -->
+                <v-col md="6" cols="12">
+                  <v-select
+                    v-model="cuentasComp.value.value"
+                    label="Cuentas con una computadora"
+                    :items="cuentasCompItem"
+                    outlined
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="cuentasComp.errorMessage.value"
+                  ></v-select>
+                </v-col>
+                <!-- Cuentas con internet -->
+                <v-col md="6" cols="12">
+                  <v-select
+                    v-model="cuentasInt.value.value"
+                    label="Cuentas con internet"
+                    :items="cuentasIntItem"
+                    outlined
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="cuentasInt.errorMessage.value"
+                  ></v-select>
+                </v-col>
+
+                <!-- Tu tarjeta de debito esta habilitada para compras por internet -->
+                <v-col md="6" cols="12">
+                  <v-select
+                    v-model="detalleTarjeta.value.value"
+                    label="Tu tarjeta de debito esta habilitada para compras por internet"
+                    :items="detalleTarjetaItem"
+                    outlined
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="detalleTarjeta.errorMessage.value"
+                  ></v-select>
+                </v-col>
+                <!-- Sabes lanzar campañas pagadas en facebook -->
+                <v-col md="6" cols="12">
+                  <v-select
+                    v-model="detalleFacebook.value.value"
+                    label="Sabes lanzar campañas pagadas en facebook"
+                    :items="detalleFacebookItem"
+                    outlined
+                    variant="outlined"
+                    persistent-hint
+                    :error-messages="detalleFacebook.errorMessage.value"
                   ></v-select>
                 </v-col>
 

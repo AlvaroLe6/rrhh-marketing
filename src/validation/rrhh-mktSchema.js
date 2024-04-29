@@ -27,12 +27,32 @@ export const validationSchema = {
       if (value?.length >= 3 ) return true
       return 'El apellido es obligatorio o es muy corto'
     },
-    comtExpArea (value) {
+    ciudadR (value) {
       if (value?.length >= 3 ) return true
       return 'El apellido es obligatorio o es muy corto'
     },
-    ciudadR (value) {
+    pretensionSal (value) {
       if (value?.length >= 3 ) return true
+      return 'El apellido es obligatorio o es muy corto'
+    },
+    cuentasComp (value) {
+      if (value?.length >= 2 ) return true
+      return 'Dato requerido'
+    },
+    cuentasInt (value) {
+      if (value?.length >= 2 ) return true
+      return 'Dato requerido'
+    },
+    detalleTarjeta (value) {
+      if (value?.length >= 2 ) return true
+      return 'Dato requerido'
+    },
+    detalleFacebook (value) {
+      if (value?.length >= 3 ) return true
+      return 'Dato requerido'
+    },
+    comtExpArea (value) {
+      if (value?.length >= 10 ) return true
       return 'El apellido es obligatorio o es muy corto'
     }
 } 
