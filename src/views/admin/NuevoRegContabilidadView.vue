@@ -69,11 +69,12 @@ const submit = handleSubmit(async (values) => {
     return `${originalId}${contador}`;
   };
   let generatedId = generateNewId();
-  const handleFileChange = async (event) => {
+
+  const fileChangeEvent = files.value; 
 
   try {
    // Espera a que la carga del archivo se complete
-   const fileUrl = await uploadFile(event); // Asegúrate de pasar el evento de cambio del archivo aquí
+   const fileUrl = await uploadFile(fileChangeEvent); // Asegúrate de pasar el evento de cambio del archivo aquí
     const generatedId = generateNewId();
 
     const docRef = await setDoc(
@@ -100,7 +101,7 @@ const submit = handleSubmit(async (values) => {
     snackbarMessage.value =
       "Error al guardar el documento. Por favor, intenta de nuevo.";
   }
-};
+
 });
 </script>
     
