@@ -3,11 +3,8 @@ import { useForm, useField } from "vee-validate";
 import { collection, setDoc, getDocs, doc } from "firebase/firestore";
 import { useFirestore } from "vuefire";
 import { useRouter } from "vue-router";
-import {
-  validationSchema,
-  imageSchema,
-} from "@/validation/contabilidadSchema.js";
-import useImage from "@/composables/useImage";
+import { validationSchema, fileSchema} from "@/validation/rrhh-mktSchema.js";
+import useFileUpload from "@/composables/useFileUpload";
 import { ref } from "vue";
 
 const fechaFin = ref(new Date().toISOString().substr(0, 10));
@@ -21,11 +18,11 @@ console.log("fechaFin", fechaFin.value);
 const { handleSubmit } = useForm({
   validationSchema: {
     ...validationSchema,
-    ...imageSchema,
+    ...fileSchema,
   },
 });
 
-const { url, uploadImage, image } = useImage();
+const { url, uploadFile, file } = useFileUpload();
 
 const nombre = useField("nombre");
 const apellido = useField("apellido");
@@ -47,10 +44,10 @@ const ciudades = ["Cobija",
                   "Tarija",
                   "Trinidad"];
 
-const imagen = useField("imagen");
+const files = useField("files");
 
 const submit = handleSubmit(async (values) => {
-  const { imagen, ...re_applicants } = values;
+  const { files, ...re_applicants } = values;
 
   let originalId = "COD-RP-";
   let contador = 1;
@@ -72,12 +69,18 @@ const submit = handleSubmit(async (values) => {
     return `${originalId}${contador}`;
   };
   let generatedId = generateNewId();
+  const handleFileChange = async (event) => {
+
   try {
+   // Espera a que la carga del archivo se complete
+   const fileUrl = await uploadFile(event); // Asegúrate de pasar el evento de cambio del archivo aquí
+    const generatedId = generateNewId();
+
     const docRef = await setDoc(
       doc(collection(db, "re_applicants"), generatedId),
       {
         ...re_applicants,
-        image: url.value,
+        file: url.value,
         idRegCaja: generatedId,
         fecha: fechaFin.value,
         estado: true,
@@ -97,6 +100,7 @@ const submit = handleSubmit(async (values) => {
     snackbarMessage.value =
       "Error al guardar el documento. Por favor, intenta de nuevo.";
   }
+};
 });
 </script>
     
@@ -140,6 +144,7 @@ const submit = handleSubmit(async (values) => {
                     label="Nombres"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="nombre.errorMessage.value"
                   ></v-text-field>
                 </v-col>
                 <!-- Apellido -->
@@ -149,6 +154,7 @@ const submit = handleSubmit(async (values) => {
                     label="Apellidos"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="apellido.errorMessage.value"
                   ></v-text-field>
                 </v-col>
                 <!-- Numero de carnet -->
@@ -158,6 +164,7 @@ const submit = handleSubmit(async (values) => {
                     label="Documento de identidad"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="nroCarnet.errorMessage.value"
                   ></v-text-field>
                 </v-col>
                 <!-- Correo electrónico -->
@@ -167,6 +174,7 @@ const submit = handleSubmit(async (values) => {
                     label="Correo electrónico"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="email.errorMessage.value"
                   ></v-text-field>
                 </v-col>
 
@@ -177,6 +185,7 @@ const submit = handleSubmit(async (values) => {
                     label="Celular"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="celular.errorMessage.value"
                   ></v-text-field>
                 </v-col>
 
@@ -187,6 +196,7 @@ const submit = handleSubmit(async (values) => {
                     label="Edad"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="edad.errorMessage.value"
                   ></v-text-field>
                 </v-col>
 
@@ -197,6 +207,7 @@ const submit = handleSubmit(async (values) => {
                     label="Profesión"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="profesion.errorMessage.value"
                   ></v-text-field>
                 </v-col>
 
@@ -209,6 +220,7 @@ const submit = handleSubmit(async (values) => {
                   outlined
                   variant="outlined"
                   persistent-hint
+                  :error-messages="ciudadR.errorMessage.value"
                   ></v-select>
                 </v-col>
 
@@ -219,6 +231,7 @@ const submit = handleSubmit(async (values) => {
                     label="Coméntanos tu experiencia en el área"
                     variant="outlined"
                     persistent-hint
+                    :error-messages="comtExpArea.errorMessage.value"
                   ></v-textarea>
                 </v-col>
 
@@ -227,18 +240,18 @@ const submit = handleSubmit(async (values) => {
                   <v-file-input
                     variant="outlined"
                     persistent-hint
-                    accept="image/jpeg"
+                    accept=".doc,.docx,.pdf"
                     label="C.V."
                     prepend-icon="mdi-cloud-upload"
                     class="ma-2"
                     color="indigo"
-                    v-model="imagen.value.value"
-                    :error-messages="imagen.errorMessage.value"
-                    @change="uploadImage"
+                    v-model="files.value.value"
+                    :error-messages="files.errorMessage.value"
+                    @change="handleFileChange"
                   />
-                  <div v-if="image" class="my-5">
+                  <div v-if="file" class="my-5">
                     <p class="font-weight-bold">Imagen</p>
-                    <img class="w-50" :src="image" />
+                    <img class="w-50" :src="file" />
                   </div>
                 </v-col>
 
