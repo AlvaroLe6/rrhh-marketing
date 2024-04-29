@@ -248,7 +248,7 @@ const submit = handleSubmit(async (values) => {
                     color="indigo"
                     v-model="files.value.value"
                     :error-messages="files.errorMessage.value"
-                    @change="handleFileChange"
+                    @change="uploadFile"
                   />
                   <div v-if="file" class="my-5">
                     <p class="font-weight-bold">Imagen</p>
