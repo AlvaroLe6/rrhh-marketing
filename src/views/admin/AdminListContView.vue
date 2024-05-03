@@ -82,6 +82,7 @@ export default {
         { title: 'Profesión', key: 'profesion' },
         { title: 'Ciudad', key: 'ciudadR' },
         { title: 'Fecha reg.', key: 'fecha' },
+        { title: 'Fase', text: 'Fase', value: 'fase' },
         { title: 'Estado', text: 'Estado', value: 'estado' },
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
@@ -110,6 +111,17 @@ export default {
         </v-btn>
       </v-toolbar>
     </template>
+    <template v-slot:item.fase="{ item }">
+    <div class="mr-2">
+      <v-chip
+        :color="item.fase ? 'green' : 'red' "
+        :text="item.fase ? 'Registrado' : 'Inactivo'"
+        class="text-uppercase"
+        size="small"
+        label
+      ></v-chip>
+    </div>
+  </template>
     <template v-slot:item.estado="{ item }">
     <div class="mr-2">
       <v-chip
@@ -123,6 +135,12 @@ export default {
   </template>
    
     <template v-slot:item.actions="{ item }">
+      <v-icon 
+      color="green-accent-3"
+      size="small" 
+      class="mr-2" 
+      @click="showDetails(item)">mdi-cached</v-icon>
+
       <v-icon 
       color="blue-darken-2"
       size="small" 

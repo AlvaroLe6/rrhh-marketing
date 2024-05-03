@@ -59,6 +59,13 @@ const detalleTarjetaItem = ["Si", "No", "No cuento con tarjeta de debito"];
 //  <!-- Sabes lanzar campañas pagadas en facebook -->
 const detalleFacebook = useField("detalleFacebook");
 const detalleFacebookItem = ["Si", "No"];
+const fileEvent = ref(null);  
+
+function handleFileChange(event) {
+  fileEvent.value = event;  // Guarda el evento para usarlo después
+}
+
+
 const submit = handleSubmit(async (values) => {
   const { files, ...re_applicants } = values;
 
@@ -87,8 +94,11 @@ const submit = handleSubmit(async (values) => {
 
   try {
     // Espera a que la carga del archivo se complete
-    const fileUrl = await uploadFile(fileChangeEvent); // Asegúrate de pasar el evento de cambio del archivo aquí
-    const generatedId = generateNewId();
+    if (fileEvent.value) {
+      const fileUrl = await uploadFile(fileEvent.value);  // Usa el evento guardado
+      values.file = fileUrl;  // Añade la URL del archivo a los valores a guardar
+    }
+
 
     const docRef = await setDoc(
       doc(collection(db, "re_applicants"), generatedId),
@@ -98,6 +108,7 @@ const submit = handleSubmit(async (values) => {
         idRegCaja: generatedId,
         fecha: fechaFin.value,
         estado: true,
+        fase:"Registrado"
       }
     );
     console.log("Documento guardado correctamente.");
@@ -311,7 +322,7 @@ const submit = handleSubmit(async (values) => {
                     color="indigo"
                     v-model="files.value.value"
                     :error-messages="files.errorMessage.value"
-                    @change="uploadFile"
+                    @change="handleFileChange"
                   />
                   <div v-if="file" class="my-5">
                     <p class="font-weight-bold">Imagen</p>

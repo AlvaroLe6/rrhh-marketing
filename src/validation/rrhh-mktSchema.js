@@ -48,7 +48,7 @@ export const validationSchema = {
       return 'Dato requerido'
     },
     detalleFacebook (value) {
-      if (value?.length >= 3 ) return true
+      if (value?.length >= 2 ) return true
       return 'Dato requerido'
     },
     comtExpArea (value) {
