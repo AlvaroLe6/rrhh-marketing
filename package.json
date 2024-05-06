@@ -18,7 +18,8 @@
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vuefire": "^3.1.18",
-    "vuetify": "^3.5.11"
+    "vuetify": "^3.5.11",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.4.0",

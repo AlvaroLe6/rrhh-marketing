@@ -1,7 +1,9 @@
 <script setup>
 
+import { ref } from 'vue';
 import { computed } from 'vue';
 import useContabilidad from '@/composables/useContabilidad'
+import * as XLSX from 'xlsx';
 
 const {
   contabilidadFecha,
@@ -30,19 +32,19 @@ const formTitle = computed(() => {
 
 const Phase = {
   REGISTRADO: 1,
-  INACTIVO: 2,
-  PENDIENTE: 3,
-  FINALIZADO: 4,
-  CANCELADO: 5
+  ENTREVISTA: 2,
+  CAPACITACION: 3,
+  CONTRATADO: 4,
+  RECHAZADO: 5
 };
 
-function getChipProperties(fase) {
+function getChipProperties(fase) { 
   const fases = {
     [Phase.REGISTRADO]: { text: 'Registrado', color: 'green' },
-    [Phase.INACTIVO]: { text: 'Inactivo', color: 'red' },
-    [Phase.PENDIENTE]: { text: 'Pendiente', color: 'yellow' },
-    [Phase.FINALIZADO]: { text: 'Finalizado', color: 'blue' },
-    [Phase.CANCELADO]: { text: 'Cancelado', color: 'grey' }
+    [Phase.ENTREVISTA]: { text: 'Entrevista', color: 'light-blue-accent-2' },
+    [Phase.CAPACITACION]: { text: 'Capacitación', color: 'light-blue-darken-4' },
+    [Phase.CONTRATADO]: { text: 'Contratado', color: 'teal-accent-4' },
+    [Phase.RECHAZADO]: { text: 'Rechazado', color: 'red' }
   };
   return fases[fase] || { text: 'Desconocido', color: 'black' };
 }
@@ -79,6 +81,28 @@ const saveItem = () => {
 const deleteItemConfirmDialog = () => {
   deleteItemConfirm();
   dialogDelete.value = false;
+};
+// exportar excel
+const exportToExcel = () => {
+  if (!contabilidadFecha.value.length) {
+    console.error('No hay datos para exportar.');
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(contabilidadFecha.value.map(item => ({
+    Nombres: item.nombre,
+    Apellidos: item.apellido,
+    "Documento de Identidad": item.nroCarnet,
+    Celular: item.celular,
+    Profesión: item.profesion,
+    Ciudad: item.ciudadR,
+    Fase: item.fase,
+    Estado: item.estado
+  })));
+  
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Registros");
+  XLSX.writeFile(wb, "Registros.xlsx");
 };
 
 </script>
@@ -142,9 +166,12 @@ export default {
   }
 },
 methods: {
+  //descargar archivo
   downloadFile(url) {
     window.open(url, '_blank');
-  }
+  },
+
+
 }
 }
 </script>
@@ -164,13 +191,16 @@ methods: {
     
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>
+        <v-toolbar-title flat >
           Lista de registros
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn color="primary" dark class="mb-2" @click="initialize">
           Actualizar
         </v-btn>
+        <v-btn color="success" @click="exportToExcel">
+      Descargar Excel
+    </v-btn>
       </v-toolbar>
     </template>
 

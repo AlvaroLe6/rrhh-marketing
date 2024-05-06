@@ -7,6 +7,7 @@ import { validationSchema, fileSchema } from "@/validation/rrhh-mktSchema.js";
 import useFileUpload from "@/composables/useFileUpload";
 import { ref } from "vue";
 
+
 const fechaFin = ref(new Date().toISOString().substr(0, 10));
 const db = useFirestore();
 const router = useRouter();
@@ -97,6 +98,7 @@ const submit = handleSubmit(async (values) => {
     if (fileEvent.value) {
       const fileUrl = await uploadFile(fileEvent.value);  // Usa el evento guardado
       values.file = fileUrl;  // Añade la URL del archivo a los valores a guardar
+      console.log( values.file , "enlace para guardar en fire base")
     }
 
 
@@ -104,7 +106,7 @@ const submit = handleSubmit(async (values) => {
       doc(collection(db, "re_applicants"), generatedId),
       {
         ...re_applicants,
-        file: url.value,
+        file: values.file,
         idRegCaja: generatedId,
         fecha: fechaFin.value,
         estado: true,
