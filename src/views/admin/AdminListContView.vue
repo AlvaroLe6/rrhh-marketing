@@ -13,6 +13,9 @@ const {
   deleteItem,
   deleteItemConfirm,
   save,
+  dialogFase,
+  openFaseDialog,
+  modificarFase
 } = useContabilidad();
 
 const tipo = ["Recibo", "Factura"];
@@ -24,6 +27,29 @@ function initialize() {
 const formTitle = computed(() => {
   return editedIndex.value === -1 ? 'Nuevo Registro' : 'Editar Registro';
 });
+
+const Phase = {
+  REGISTRADO: 1,
+  INACTIVO: 2,
+  PENDIENTE: 3,
+  FINALIZADO: 4,
+  CANCELADO: 5
+};
+
+function getChipProperties(fase) {
+  const fases = {
+    [Phase.REGISTRADO]: { text: 'Registrado', color: 'green' },
+    [Phase.INACTIVO]: { text: 'Inactivo', color: 'red' },
+    [Phase.PENDIENTE]: { text: 'Pendiente', color: 'yellow' },
+    [Phase.FINALIZADO]: { text: 'Finalizado', color: 'blue' },
+    [Phase.CANCELADO]: { text: 'Cancelado', color: 'grey' }
+  };
+  return fases[fase] || { text: 'Desconocido', color: 'black' };
+}
+
+
+
+
 // Métodos para abrir los diálogos
 const openEditDialog = (item) => {
   editItem(item);
@@ -66,38 +92,74 @@ export default {
       //Componentes de la tabla 
       dialog: false,
       dialogDelete: false,
+
+      //estado de la columnas extra
+      showExtraColumns: false,
+
       headers: [
         {
           title: 'Codigo registro',
           align: 'start',
           sortable: false,
-          key: 'idRegCaja',
+          value: 'idRegCaja',
+          hidden: true
         },
-        { title: 'Nombres', key: 'nombre' },
-        { title: 'Apellidos', key: 'apellido' },
-        { title: 'Documento de identidad', key: 'nroCarnet' },
-        { title: 'Correo', key: 'email' },
-        { title: 'Celular', key: 'celular' },
-        { title: 'Edad', key: 'edad' },
-        { title: 'Profesión', key: 'profesion' },
-        { title: 'Ciudad', key: 'ciudadR' },
-        { title: 'Fecha reg.', key: 'fecha' },
+        { title: 'Nombres', value: 'nombre' },
+        { title: 'Apellidos', value: 'apellido' },
+        { title: 'Documento de identidad', value: 'nroCarnet' },
+        { title: 'Correo', value: 'email',hidden: true },
+        { title: 'Celular', value: 'celular' },
+        { title: 'Edad', value: 'edad',hidden: true },
+        { title: 'Profesión', value: 'profesion' },
+        { title: 'Ciudad', value: 'ciudadR' },
+        { title: 'Archivo', value: 'file' },
+        { title: 'Fecha reg.', value: 'fecha',hidden: true },
         { title: 'Fase', text: 'Fase', value: 'fase' },
-        { title: 'Estado', text: 'Estado', value: 'estado' },
+        { title: 'Estado', text: 'Estado', value: 'estado'},
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
       //------------------------------------------------
     };
   },
-};
+  computed: {
+
+    //Maneja las columnas visibles
+  visibleHeaders() {
+    if (this.showExtraColumns) {
+      return this.headers;
+    } else {
+      return this.headers.filter(header => !header.hidden);
+    }
+  },
+  // Muestra las columnas adicionales
+  toggleExtraColumns() {
+    // Ajusta la propiedad hidden basada en showExtraColumns
+    this.headers.forEach(header => {
+      if (header.hidden !== undefined) {
+        header.hidden = !this.showExtraColumns;
+      }
+    });
+  }
+},
+methods: {
+  downloadFile(url) {
+    window.open(url, '_blank');
+  }
+}
+}
 </script>
 
 <template>
   <v-btn color="blue" variant="flat" :to="{ name: 'nuevo-reg-contabilidad' }">Nuevo Registro</v-btn>
 
   <h2 class="text-center text-h3 my-5 font-weight-bold">Lista de registros</h2>
+  <v-checkbox
+    label="Mostrar detalles adicionales"
+    v-model="showExtraColumns"
+    @change="toggleExtraColumns"
+  ></v-checkbox>
 
-  <v-data-table v-if="contabilidadFecha.length" :headers="headers" :items="contabilidadFecha"
+  <v-data-table v-if="contabilidadFecha.length" :headers="visibleHeaders" :items="contabilidadFecha"
     :sort-by="[{ key: 'idRegCaja', order: 'asc' }]">
     
     <template v-slot:top>
@@ -111,15 +173,36 @@ export default {
         </v-btn>
       </v-toolbar>
     </template>
+
+    <template v-slot:item.file="{ item }">
+  <v-tooltip bottom>
+    <template v-slot:activator="{ on, attrs }">
+      <v-icon
+        small
+        color="blue darken-2"
+        v-bind="attrs"
+        v-on="on"
+        @click="downloadFile(item.file)"  
+        
+      ><!-- Asegúrate que `item.archivo` es la URL del archivo -->
+        mdi-file-download
+      </v-icon>
+    </template>
+    <span>Descargar archivo</span>
+  </v-tooltip>
+</template>
+
     <template v-slot:item.fase="{ item }">
     <div class="mr-2">
-      <v-chip
-        :color="item.fase ? 'green' : 'red' "
-        :text="item.fase ? 'Registrado' : 'Inactivo'"
-        class="text-uppercase"
-        size="small"
-        label
-      ></v-chip>
+      <v-chip 
+      :color="getChipProperties(item.fase).color"
+      :text="getChipProperties(item.fase).text"
+      class="text-uppercase"
+      size="small"
+      label
+      >
+        {{ getChipProperties(item.fase).text }}
+      </v-chip>
     </div>
   </template>
     <template v-slot:item.estado="{ item }">
@@ -139,7 +222,7 @@ export default {
       color="green-accent-3"
       size="small" 
       class="mr-2" 
-      @click="showDetails(item)">mdi-cached</v-icon>
+      @click="openFaseDialog(item)">mdi-cached</v-icon>
 
       <v-icon 
       color="blue-darken-2"
@@ -148,7 +231,7 @@ export default {
       @click="showDetails(item)"> mdi-eye</v-icon>
 
       <v-icon 
-      color="green-darken-2"
+      color="blue-grey-darken-2"
       size="small" 
       class="mr-2" 
       @click="openEditDialog(item)"> mdi-pencil</v-icon>
@@ -198,6 +281,25 @@ export default {
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Diálogo para cambiar de fase de los registros -->
+
+
+  <v-dialog v-model="dialogFase" max-width="300px">
+    <v-card>
+      <v-card-title class="text-h5">Cambiar Fase</v-card-title>
+      <v-card-text>
+        ¿Deseas subir o bajar la fase del registro?
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="green" text @click="modificarFase(1)">Subir</v-btn>
+        <v-btn color="red" text @click="modificarFase(-1)">Bajar</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn text @click="dialogFase = false">Cancelar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
 
   <!-- Diálogo para confirmar la eliminación de registros -->
   <v-dialog v-model="dialogDelete" max-width="500px">

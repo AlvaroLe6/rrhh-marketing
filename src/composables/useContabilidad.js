@@ -12,6 +12,10 @@ export default  function useContabilidad(){
     const dialogDelete = ref(false);
     const editedItem = ref(null);
     const editedIndex = ref(-1);
+    // Estado para controlar la visibilidad del diálogo
+  const dialogFase = ref(false);
+   // Item seleccionado para cambiar la fase
+   const selectedForFaseChange = ref(null);
 
 // Propiedad computada para formatear las fechas
 const contabilidadFecha = ref([]);
@@ -131,6 +135,34 @@ const save = async () => {
   }
 };
 
+
+ // Abre el diálogo de la fase.
+const openFaseDialog = (item) => {
+  selectedForFaseChange.value = item;
+  dialogFase.value = true;
+};
+// Modifica la fase.
+const modificarFase = async (change) => {
+  if (!selectedForFaseChange.value) return;
+
+  const newFase = selectedForFaseChange.value.fase + change;
+  if (newFase < 1 || newFase > 5) {
+    console.error('Fase fuera de rango.');
+    return; // Evitar cambiar a una fase no válida
+  }
+
+  const itemRef = doc(db, 're_applicants', selectedForFaseChange.value.id);
+  try {
+    await updateDoc(itemRef, {
+      fase: newFase
+    });
+    // Actualiza la fase en la UI
+    selectedForFaseChange.value.fase = newFase;
+    dialogFase.value = false;
+  } catch (error) {
+    console.error("Error al cambiar la fase:", error);
+  }
+};
     return{  
       contabilidadCollection,
       contabilidadFecha,
@@ -141,8 +173,10 @@ const save = async () => {
       editItem,
       deleteItem,
       deleteItemConfirm,
-      save
-
+      save,
+      dialogFase,
+      openFaseDialog,
+      modificarFase
     }
     
 }

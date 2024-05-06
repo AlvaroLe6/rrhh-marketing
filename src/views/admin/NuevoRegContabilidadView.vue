@@ -108,7 +108,7 @@ const submit = handleSubmit(async (values) => {
         idRegCaja: generatedId,
         fecha: fechaFin.value,
         estado: true,
-        fase:"Registrado"
+        fase:1
       }
     );
     console.log("Documento guardado correctamente.");
