@@ -82,6 +82,7 @@ const deleteItemConfirmDialog = () => {
   deleteItemConfirm();
   dialogDelete.value = false;
 };
+
 // exportar excel
 const exportToExcel = () => {
   if (!contabilidadFecha.value.length) {
@@ -195,10 +196,14 @@ methods: {
           Lista de registros
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn color="primary" dark class="mb-2" @click="initialize">
+        <v-btn 
+        variant="outlined"
+        color="primary" dark class="mb-2" @click="initialize">
           Actualizar
         </v-btn>
-        <v-btn color="success" @click="exportToExcel">
+        <v-btn 
+        variant="outlined"
+        color="success" @click="exportToExcel">
       Descargar Excel
     </v-btn>
       </v-toolbar>
@@ -290,16 +295,16 @@ methods: {
         <v-container>
           <v-row>
             <v-col cols="12" sm="6">
-              <v-text-field v-model="editedItem.monto" label="Monto (Bs.)"></v-text-field>
+              <v-text-field v-model="editedItem.celular" label="Monto (Bs.)"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
-              <v-select v-model="editedItem.tipoPago"  :items="tipo"  label="Tipo"></v-select>
+              <v-select v-model="editedItem.ciudadR"  :items="tipo"  label="Tipo"></v-select>
             </v-col>
             <v-col cols="12" sm="6">
-              <v-text-field v-model="editedItem.fecha" label="Fecha" type="date"></v-text-field>
+              <v-text-field v-model="editedItem.profesion" label="Fecha" type="date"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
-              <v-text-field v-model="editedItem.detalle" label="Detalle" multiline></v-text-field>
+              <v-text-field v-model="editedItem.profesion" label="Detalle" multiline></v-text-field>
             </v-col>
           </v-row>
         </v-container>
