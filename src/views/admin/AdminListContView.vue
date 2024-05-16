@@ -27,7 +27,7 @@ function initialize() {
 }
 
 const formTitle = computed(() => {
-  return editedIndex.value === -1 ? 'Nuevo Registro' : 'Editar Registro';
+  return editecontabilidadFechadIndex.value === -1 ? 'Nuevo Registro' : 'Editar Registro';
 });
 
 const Phase = {
@@ -48,9 +48,6 @@ function getChipProperties(fase) {
   };
   return fases[fase] || { text: 'Desconocido', color: 'black' };
 }
-
-
-
 
 // Métodos para abrir los diálogos
 const openEditDialog = (item) => {
@@ -106,6 +103,17 @@ const exportToExcel = () => {
   XLSX.writeFile(wb, "Registros.xlsx");
 };
 
+
+const filtroFecha = ref('');
+const filtroFase = ref('');
+
+const registrosFiltrados = computed(() => {
+  return registros.value.filter(registro => {
+    return (!filtroFecha.value || registro.fecha === filtroFecha.value) &&
+           (!filtroFase.value || registro.fase === filtroFase.value);
+  });
+});
+
 </script>
 
 <script>
@@ -143,37 +151,46 @@ export default {
         { title: 'Estado', text: 'Estado', value: 'estado'},
         { title: 'Acciones', key: 'actions', sortable: false },
       ],
-      //------------------------------------------------
+
     };
   },
   computed: {
 
     //Maneja las columnas visibles
-  visibleHeaders() {
-    if (this.showExtraColumns) {
-      return this.headers;
-    } else {
-      return this.headers.filter(header => !header.hidden);
+          visibleHeaders() {
+            if (this.showExtraColumns) {
+              return this.headers;
+            } else {
+              return this.headers.filter(header => !header.hidden);
+            }
+          },
+          // Muestra las columnas adicionales
+          toggleExtraColumns() {
+            // Ajusta la propiedad hidden basada en showExtraColumns
+            this.headers.forEach(header => {
+              if (header.hidden !== undefined) {
+                header.hidden = !this.showExtraColumns;
+              }
+            });
+          },
+          filteredData() {
+    if (!Array.isArray(this.contabilidadFecha)) {
+      return [];
     }
-  },
-  // Muestra las columnas adicionales
-  toggleExtraColumns() {
-    // Ajusta la propiedad hidden basada en showExtraColumns
-    this.headers.forEach(header => {
-      if (header.hidden !== undefined) {
-        header.hidden = !this.showExtraColumns;
-      }
+    return this.contabilidadFecha.filter(item => {
+      const matchesFecha = !this.filters.fecha || item.fecha === this.filters.fecha;
+      const matchesFase = !this.filters.fase || item.fase === this.filters.fase;
+      return matchesFecha && matchesFase;
     });
   }
-},
+    },
+        
 methods: {
-  //descargar archivo
-  downloadFile(url) {
-    window.open(url, '_blank');
-  },
-
-
-}
+            //descargar archivo
+            downloadFile(url) {
+              window.open(url, '_blank');
+            },
+            }
 }
 </script>
 
@@ -187,7 +204,9 @@ methods: {
     @change="toggleExtraColumns"
   ></v-checkbox>
 
-  <v-data-table v-if="contabilidadFecha.length" :headers="visibleHeaders" :items="contabilidadFecha"
+  <v-data-table 
+  v-if="contabilidadFecha.length" 
+  :headers="visibleHeaders" :items="contabilidadFecha"
     :sort-by="[{ key: 'idRegCaja', order: 'asc' }]">
     
     <template v-slot:top>
@@ -207,7 +226,33 @@ methods: {
       Descargar Excel
     </v-btn>
       </v-toolbar>
-    </template>
+      <v-toolbar>
+  <v-text-field
+    v-model="filtroFecha"
+    label="Filtrar por fecha"
+    type="date"
+    prepend-icon="mdi-calendar"
+    clearable
+  ></v-text-field>
+
+  <v-select
+    v-model="filtroFase"
+    :items="['REGISTRADO', 'ENTREVISTA', 'CAPACITACIÓN', 'CONTRATADO', 'RECHAZADO']"
+    label="Filtrar por fase"
+    prepend-icon="mdi-filter-variant"
+    clearable
+    item-text="name"
+    item-value="name"
+  ></v-select>
+
+  <v-btn icon @click="applyFilters">
+    <v-icon>mdi-filter</v-icon>
+  </v-btn>
+</v-toolbar>
+  
+
+</template>
+
 
     <template v-slot:item.file="{ item }">
   <v-tooltip bottom>
