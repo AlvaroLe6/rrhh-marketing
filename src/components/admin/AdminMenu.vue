@@ -16,7 +16,7 @@ console.log("Nombre de usuario cargado:", userProfile.value.username);
 
   <div class="user-profile">
     <v-btn 
-    color="success" 
+    color="teal-lighten-3" 
     variant="outlined">
     Administrador
         
@@ -25,7 +25,7 @@ console.log("Nombre de usuario cargado:", userProfile.value.username);
 
           <v-list>
             <!--  Inicio -->
-            <v-list-item :to="{ name: 'admin-list-contabilidad' }">
+            <v-list-item :to="{ name: 'admin-admin' }">
               <template #prepend>
                 <v-icon class="me-2" icon="mdi-menu" size="22" />
               </template>
