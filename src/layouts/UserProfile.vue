@@ -7,8 +7,7 @@ const authStore = useAuthStore();
 
 const { userProfile } = storeToRefs(authStore);
 
-console.log("user name11111111111", userProfile.username)
-console.log("user name", authUser)
+
 console.log("Nombre de usuario cargado:", userProfile.value.username);
 
 </script>
@@ -53,7 +52,7 @@ console.log("Nombre de usuario cargado:", userProfile.value.username);
             <!-- Perfil -->
             <VListItem :to="{ name: 'account-settings' }">
               <template #prepend>
-                <VIcon class="me-2" icon="ri-user-line" size="22" />
+                <VIcon class="me-2" icon="mdi-account" size="22" />
               </template>
 
               <VListItemTitle :to="{ name: 'account-settings' }">Perfil</VListItemTitle>
@@ -62,7 +61,7 @@ console.log("Nombre de usuario cargado:", userProfile.value.username);
             <!-- 👉 Settings -->
             <VListItem link>
               <template #prepend>
-                <VIcon class="me-2" icon="ri-settings-4-line" size="22" />
+                <v-icon class="me-2" icon="mdi-nut" size="22" />
               </template>
 
               <VListItemTitle>
@@ -76,7 +75,7 @@ console.log("Nombre de usuario cargado:", userProfile.value.username);
             <!-- 👉 Logout -->
             <VListItem to="/login">
               <template #prepend>
-                <VIcon class="me-2" icon="ri-logout-box-r-line" size="22" />
+                <VIcon class="me-2" icon="mdi-logout" size="22" />
               </template>
 
               <VListItemTitle @click="authStore.logout"> Cerrar sesión</VListItemTitle>

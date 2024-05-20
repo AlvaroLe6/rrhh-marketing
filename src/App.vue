@@ -3,6 +3,7 @@ import Footer from "@/views/Footer.vue";
 import { RouterView } from "vue-router";
 import { useAuthStore } from "./stores/auth";
 import UserProfile from "@/layouts/UserProfile.vue";
+import AdminMenu from "@/components/admin/AdminMenu.vue";
 
 const auth = useAuthStore();
 </script>
@@ -22,11 +23,10 @@ const auth = useAuthStore();
 
         <div class="right-section">
           <div v-if="auth.isAuth">
-            <v-btn :to="{ name: 'admin-list-contabilidad' }" class="mr-4">
-              Admin
-            </v-btn>
+            <AdminMenu v-if="auth.isAuth" />
           </div>
           <UserProfile v-if="auth.isAuth" />
+          
           <div v-else>
             <v-menu >
               <template v-slot:activator="{ props }">

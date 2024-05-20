@@ -1,44 +1,46 @@
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
+    import { createApp } from 'vue'
+    import { createPinia } from 'pinia'
+    import VueDatePicker from '@vuepic/vue-datepicker';
+    import '@vuepic/vue-datepicker/dist/main.css'
 
-//Vuetify
+    //Vuetify
 
-import "Vuetify/styles"
-import { createVuetify} from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+    import 'vuetify/styles' 
+    import { createVuetify} from 'vuetify'
+    import * as components from 'vuetify/components'
+    import * as directives from 'vuetify/directives'
 
-//Firebase
-import { VueFire, VueFireAuth } from 'vuefire'
-import { firebaseApp } from './config/firebase'
+    //Firebase
+    import { VueFire, VueFireAuth } from 'vuefire'
+    import { firebaseApp } from './config/firebase'
 
 
-import App from './App.vue'
-import router from './router'
+    import App from './App.vue'
+    import router from './router'
 
-import '@mdi/font/css/materialdesignicons.css'
+    import '@mdi/font/css/materialdesignicons.css'
+    import 'remixicon/fonts/remixicon.css'
 
-const app = createApp(App)
+    // Vuetify
+    const vuetify = createVuetify({
+        icons: {
+          defaultSet: 'mdi', // Set de iconos por defecto
+        },
+        components,
+        directives,
+      });
+    const app = createApp(App)
 
-// Vuetify
-const vuetify = createVuetify({
-    components,
-    directives
+    //Firebase
+    app.use(VueFire,{
+        firebaseApp,
+        modules: [VueFireAuth()],
+    })
 
-})
+    app.component('VueDatePicker', VueDatePicker);
+    app.use(vuetify)
+    app.use(createPinia())
+    app.use(router)
 
-//Firebase
-app.use(VueFire,{
-    firebaseApp,
-    modules: [VueFireAuth()]
-})
-
-app.component('VueDatePicker', VueDatePicker);
-app.use(vuetify)
-app.use(createPinia())
-app.use(router)
-
-app.mount('#app')
+    app.mount('#app')

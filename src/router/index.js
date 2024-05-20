@@ -37,6 +37,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: '/admin/admin',
+          name: 'admin-admin',
+          component: () => import('../views/admin/AdminView.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
           path: '/admin/list_contabilidad',
           name: 'admin-list-contabilidad',
           component: () => import('../views/admin/AdminListContView.vue'),

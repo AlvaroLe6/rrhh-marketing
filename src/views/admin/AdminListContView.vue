@@ -1,7 +1,6 @@
 <script setup>
 
-import { ref } from 'vue';
-import { computed } from 'vue';
+import { ref, computed, onMounted} from 'vue';
 import useContabilidad from '@/composables/useContabilidad'
 import * as XLSX from 'xlsx';
 
@@ -20,7 +19,11 @@ const {
   modificarFase
 } = useContabilidad();
 
+const filtroFecha = ref('');
+const filtroFase = ref(null);
+
 const tipo = ["Recibo", "Factura"];
+const tipo1 = ["REGISTRADO", "Entrevista"];
 
 function initialize() {
   // Tu código para inicializar o recargar los datos
@@ -103,17 +106,31 @@ const exportToExcel = () => {
   XLSX.writeFile(wb, "Registros.xlsx");
 };
 
-
-const filtroFecha = ref('');
-const filtroFase = ref('');
+const fasesDisponibles = [
+  { value: 1, title: 'Registrado' },
+  { value: 2, title: 'Entrevista' },
+  { value: 3, title: 'Capacitación' },
+  { value: 4, title: 'Contratado' },
+  { value: 5, title: 'Rechazado' }
+];
 
 const registrosFiltrados = computed(() => {
-  return registros.value.filter(registro => {
-    return (!filtroFecha.value || registro.fecha === filtroFecha.value) &&
-           (!filtroFase.value || registro.fase === filtroFase.value);
+  return contabilidadFecha.value.filter(registro => {
+    return (!filtroFase.value || registro.fase === filtroFase.value);
   });
 });
-
+function aplicarFiltros() {
+  // Este método se llama cuando se cambian los filtros
+console.log('Aplicando filtros:', { fase: filtroFase.value });
+}
+function limpiarFiltros() {
+  filtroFecha.value = '';
+  filtroFase.value = null;
+}
+onMounted(() => {
+  // Asegúrate de que todos los datos necesarios estén inicializados
+  if (!contabilidadFecha.value) contabilidadFecha.value = [];
+});
 </script>
 
 <script>
@@ -128,6 +145,8 @@ export default {
 
       //estado de la columnas extra
       showExtraColumns: false,
+
+
 
       headers: [
         {
@@ -192,70 +211,91 @@ methods: {
             },
             }
 }
+
+
 </script>
 
 <template>
   <v-btn color="blue" variant="flat" :to="{ name: 'nuevo-reg-contabilidad' }">Nuevo Registro</v-btn>
 
-  <h2 class="text-center text-h3 my-5 font-weight-bold">Lista de registros</h2>
-  <v-checkbox
-    label="Mostrar detalles adicionales"
+  <h3 class="text-center text-h4 my-5 font-weight-bold">Lista de registros asesores de marketing</h3>
+
+  <v-data-table 
+  class="data-table"
+  v-if="contabilidadFecha.length" 
+  :headers="visibleHeaders" 
+  :items="registrosFiltrados"
+  :sort-by="[{ key: 'idRegCaja', order: 'asc' }]">
+    
+    <template v-slot:top>
+      <v-toolbar class="toolbar-tabla" flat>
+        <div class="container-filtros">
+        <v-text-field
+          class="text-field-buscar"
+      
+          label="Buscar"
+          clearable     
+          variant="outlined"
+          @change="aplicarFiltros"
+        ></v-text-field>
+
+        <v-text-field
+          class="text-field-fecha"
+          v-model="filtroFecha"
+          label="Fecha registro"
+          type="date"
+          clearable     
+          variant="outlined"
+          @change="aplicarFiltros"
+
+        ></v-text-field>
+        
+        <v-select
+          class="select-fase"
+          v-model="filtroFase"
+          :items="fasesDisponibles"
+          item-text="text"
+          item-value="value"
+          label="Fase"
+          variant="outlined"
+          @change="aplicarFiltros"
+        ></v-select>
+
+        <v-btn 
+        class="btn-limpiar-filtro"
+        variant="outlined"
+        @click="limpiarFiltros">
+        Limpiar Filtros
+      </v-btn>
+        <v-btn 
+        class="btn-actualizar"
+        prepend-icon="mdi-cached"
+        variant="outlined"
+        color="primary" dark 
+       @click="initialize">
+          Actualizar
+        </v-btn>
+        <v-btn
+        class="btn-descargar" 
+        prepend-icon="mdi-download"
+        variant="outlined"
+        color="success" 
+        @click="exportToExcel">
+        Excel
+      </v-btn>
+
+    </div>
+    <v-spacer></v-spacer>
+    <v-checkbox
+        class="checkbox-ver-detalles"
+    label="Ver detalles adicionales"
     v-model="showExtraColumns"
     @change="toggleExtraColumns"
   ></v-checkbox>
-
-  <v-data-table 
-  v-if="contabilidadFecha.length" 
-  :headers="visibleHeaders" :items="contabilidadFecha"
-    :sort-by="[{ key: 'idRegCaja', order: 'asc' }]">
-    
-    <template v-slot:top>
-      <v-toolbar flat>
-        <v-toolbar-title flat >
-          Lista de registros
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn 
-        variant="outlined"
-        color="primary" dark class="mb-2" @click="initialize">
-          Actualizar
-        </v-btn>
-        <v-btn 
-        variant="outlined"
-        color="success" @click="exportToExcel">
-      Descargar Excel
-    </v-btn>
-      </v-toolbar>
-      <v-toolbar>
-  <v-text-field
-    v-model="filtroFecha"
-    label="Filtrar por fecha"
-    type="date"
-    prepend-icon="mdi-calendar"
-    clearable
-  ></v-text-field>
-
-  <v-select
-    v-model="filtroFase"
-    :items="['REGISTRADO', 'ENTREVISTA', 'CAPACITACIÓN', 'CONTRATADO', 'RECHAZADO']"
-    label="Filtrar por fase"
-    prepend-icon="mdi-filter-variant"
-    clearable
-    item-text="name"
-    item-value="name"
-  ></v-select>
-
-  <v-btn icon @click="applyFilters">
-    <v-icon>mdi-filter</v-icon>
-  </v-btn>
 </v-toolbar>
-  
-
 </template>
-
-
     <template v-slot:item.file="{ item }">
-  <v-tooltip bottom>
+      <v-tooltip bottom>
     <template v-slot:activator="{ on, attrs }">
       <v-icon
         small
@@ -396,3 +436,70 @@ methods: {
     </v-card>
   </v-dialog>
 </template>
+<style>
+.data-table{
+  padding: 10px;
+  border-collapse: collapse; /* Las líneas de la tabla no tienen espacios */
+}
+.toolbar-tabla {
+  background-color: transparent;
+  padding: 10px;
+}
+.container-filtros {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.text-field-buscar,
+.text-field-fecha,
+.select-fase{
+  max-width: 200px;
+  width: 200px;
+  height:40px;
+}
+.checkbox-ver-detalles{
+  max-width: 220px;
+  width: 220px;
+  height:40px;
+  font-size: 11;
+}
+
+/* Ajusta la altura del v-select y v-field */
+.v-field__input {
+  min-height: 0 !important; /* Sobrescribe el min-height */
+  padding-bottom: 0 !important; 
+  display: flex;
+  align-items: center;
+  height: 40px; /* Ajusta la altura*/
+}
+.v-input__control {
+  min-height: 40px !important; /* Altura mínima*/
+  display: flex;
+  align-items: center;
+}
+.btn-descargar{
+  padding: 10px 12px; 
+  font-size: 12px; 
+}
+.btn-actualizar {
+  padding: 10px 5px; 
+  font-size: 12px; 
+}
+.btn-limpiar-filtro {
+  padding: 10px 5px; 
+  font-size: 12px; 
+}
+.data-table thead {
+  background-color: #d1dbe9;
+  padding: 10px;
+ }
+.data-table th, .data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #162D4B; /* Añade una línea en la parte inferior de las celdas */
+  border-right: 1px solid #162D4B; /* Añade una línea a la derecha de las celdas */
+  border-left: 1px solid #162D4B; /* Añade una línea a la izquierda de las celdas */
+  border-top: 1px solid #162D4B; /* Añade una línea en la parte superior de las celdas */
+
+}
+
+</style>
