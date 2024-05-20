@@ -232,7 +232,6 @@ methods: {
         <div class="container-filtros">
         <v-text-field
           class="text-field-buscar"
-      
           label="Buscar"
           clearable     
           variant="outlined"
@@ -247,7 +246,6 @@ methods: {
           clearable     
           variant="outlined"
           @change="aplicarFiltros"
-
         ></v-text-field>
         
         <v-select
@@ -287,9 +285,10 @@ methods: {
     </div>
     <v-spacer></v-spacer>
     <v-checkbox
-        class="checkbox-ver-detalles"
+    class="checkbox-ver-detalles"
     label="Ver detalles adicionales"
     v-model="showExtraColumns"
+    color="success"
     @change="toggleExtraColumns"
   ></v-checkbox>
 </v-toolbar>
