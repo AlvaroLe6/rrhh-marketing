@@ -1,11 +1,36 @@
-  <script setup>
+<script setup>
 import Footer from "@/views/Footer.vue";
-import { RouterView } from "vue-router";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth";
 import UserProfile from "@/layouts/UserProfile.vue";
 import AdminMenu from "@/components/admin/AdminMenu.vue";
+import { useStateCheckbox } from '@/stores/stateCheckbox';
 
+const router = useRouter();
 const auth = useAuthStore();
+const checkboxStore = useStateCheckbox();
+
+const items = [
+      { title: "Asesor de Marketing", route: 'nuevo-re-contabilidad'},
+      { title: "Docente", route:'nuevo-re-contabilidad'},
+      { title: "Personal Administrativo", route:'nuevo-re-contabilidad'},
+];
+
+function redirectToView(route) {
+  router.push({ name: route });
+}
+function isItemDisabled(title) {
+  switch (title) {
+    case "Asesor de Marketing":
+      return checkboxStore.marketingDisabled;
+    case "Docente":
+      return checkboxStore.docenteDisabled;
+    case "Personal Administrativo":
+      return checkboxStore.adminDisabled;
+    default:
+      return false;
+  }
+}
 </script>
   <template>
   <v-app>
@@ -41,15 +66,13 @@ const auth = useAuthStore();
                 </v-btn>
               </template>
               <v-list
-              class="list"
-              
-              >
+              class="list">
                 <v-list-item
-                class="list-item"
-             
+                  class="list-item"
                   v-for="(item, index) in items"
                   :key="index"
                   @click="redirectToView(item.route)"
+                  :disabled="false"
                 >
                   <v-list-item-title
                   color="teal-lighten-3"
@@ -70,22 +93,7 @@ const auth = useAuthStore();
     <Footer />
   </v-app>
 </template>
-  <script>
-export default {
-  data: () => ({
-    items: [
-      { title: "Asesor de Marketing", route: 'nuevo-re-contabilidad'},
-      { title: "Docente", route:'nuevo-re-contabilidad'},
-      { title: "Personal Administrativo", route:'nuevo-re-contabilidad'},
-    ],
-  }),
-  methods: {
-    redirectToView(route) {
-      this.$router.push({ name: route });
-    },
-  },
-};
-</script>
+
   <style scoped>
 .nav-container {
   display: flex;
