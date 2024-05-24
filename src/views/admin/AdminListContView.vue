@@ -19,7 +19,7 @@ const {
   modificarFase
 } = useContabilidad();
 
-const filtroFecha = ref('');
+const rangoFecha = ref([]);
 const filtroFase = ref(null);
 
 const tipo = ["Recibo", "Factura"];
@@ -116,15 +116,22 @@ const fasesDisponibles = [
 
 const registrosFiltrados = computed(() => {
   return contabilidadFecha.value.filter(registro => {
-    return (!filtroFase.value || registro.fase === filtroFase.value);
+    const faseMatch = !filtroFase.value || registro.fase === filtroFase.value;
+    const fechaMatch =
+      !rangoFecha.value.length ||
+      (new Date(registro.fecha) >= new Date(rangoFecha.value[0]) &&
+        new Date(registro.fecha) <= new Date(rangoFecha.value[1]));
+    return faseMatch && fechaMatch;
   });
 });
 function aplicarFiltros() {
   // Este método se llama cuando se cambian los filtros
-console.log('Aplicando filtros:', { fase: filtroFase.value });
+  console.log('Aplicando filtros:',
+   { fase: filtroFase.value, rangoFecha: filtroRangoFecha.value });
 }
+
 function limpiarFiltros() {
-  filtroFecha.value = '';
+  rangoFecha.value = [];
   filtroFase.value = null;
 }
 onMounted(() => {
@@ -230,23 +237,25 @@ methods: {
     <template v-slot:top>
       <v-toolbar class="toolbar-tabla" flat>
         <div class="container-filtros">
-        <v-text-field
+          <v-text-field
           class="text-field-buscar"
           label="Buscar"
           clearable     
           variant="outlined"
           @change="aplicarFiltros"
         ></v-text-field>
-
-        <v-text-field
-          class="text-field-fecha"
-          v-model="filtroFecha"
-          label="Fecha registro"
-          type="date"
-          clearable     
-          variant="outlined"
-          @change="aplicarFiltros"
-        ></v-text-field>
+<div class="d-flex justify-center">
+        <v-date-picker
+            v-model="rangoFecha"
+            label="Seleccionar rango de fechas"
+            multiple="range"
+            clearable
+            variant="outlined"
+            persistent-placeholder
+            max-width="368"
+            @change="aplicarFiltros"
+          ></v-date-picker>
+</div>
         
         <v-select
           class="select-fase"

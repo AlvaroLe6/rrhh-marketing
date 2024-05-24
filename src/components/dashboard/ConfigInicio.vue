@@ -1,25 +1,51 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from 'vue';
 import { useStateCheckbox } from '@/stores/stateCheckbox';
 
-const stateCheckbox = useStateCheckbox();
 
-function toggleCheckbox(type) {
-  console.log('Toggling Checkbox:', type);
-  switch (type) {
-    case 'marketing':
-    stateCheckbox.toggleMarketing();
-      break;
-    case 'admin':
-    stateCheckbox.toggleAdmin();
-      break;
-    case 'docente':
-    stateCheckbox.toggleDocente();
-      break;
-  }
-  console.log('Marketing Disabled:', stateCheckbox.marketingDisabled);
-  console.log('Admin Disabled:', stateCheckbox.adminDisabled);
-  console.log('Docente Disabled:', stateCheckbox.docenteDisabled);
+const stateCheckbox = useStateCheckbox();
+const tempMarketingDisabled = ref(stateCheckbox.marketingDisabled);
+const tempAdminDisabled = ref(stateCheckbox.adminDisabled);
+const tempDocenteDisabled = ref(stateCheckbox.docenteDisabled);
+
+const snackbar = ref(false);
+const snackbarMessage = ref('');
+
+onMounted(() => {
+  stateCheckbox.buscarStates().then(()=>{
+    tempMarketingDisabled.value = stateCheckbox.marketingDisabled;
+    tempAdminDisabled.value = stateCheckbox.adminDisabled;
+    tempDocenteDisabled.value = stateCheckbox.docenteDisabled;
+});
+});
+
+function guardarStates() {
+  stateCheckbox.setMarketingDisabled(tempMarketingDisabled.value);
+  stateCheckbox.setAdminDisabled(tempAdminDisabled.value);
+  stateCheckbox.setDocenteDisabled(tempDocenteDisabled.value);
+
+  stateCheckbox.actualizarStates('btn_marketing', tempMarketingDisabled.value)
+  .then(()=>stateCheckbox.actualizarStates('btn_admin', tempAdminDisabled.value))
+  .then(() =>stateCheckbox.actualizarStates('btn_docente', tempDocenteDisabled.value))
+  .then(() => {
+    snackbarMessage.value = 'Estados guardados con éxito';
+    snackbar.value = true;
+  }).catch((error) => {
+    snackbarMessage.value = 'Error al guardar los estados';
+    snackbar.value = true;
+  });
+}
+
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    snackbarMessage.value = 'Enlace copiado al portapapeles';
+    snackbar.value = true;
+  }).catch(err => {
+    console.error('Error al copiar al portapapeles: ', err);
+    snackbarMessage.value = 'Error al copiar el enlace';
+    snackbar.value = true;
+  });
 }
 </script>
 
@@ -30,22 +56,25 @@ function toggleCheckbox(type) {
       <v-row>
         <v-col cols="12">
           <v-checkbox
-            v-model="stateCheckbox.marketingDisabled"
+            v-model="tempMarketingDisabled"
             label="Desactivar el formulario de marketing"
-            @change="() => toggleCheckbox('marketing')"
             ></v-checkbox>
           <v-row align="center">
             <v-col cols="9">
               <p>http://localhost:5173/admin/list_contabilidad</p>
             </v-col>
             <v-col cols="3">
-              <v-btn  prepend-icon="mdi-link-variant">Copiar</v-btn>
+              <v-btn 
+              color="primary"
+              prepend-icon="mdi-link-variant"
+              @click="copyToClipboard('http://localhost:5173/admin/list_contabilidad')"
+              >Copiar</v-btn>
             </v-col>
           </v-row>
         </v-col>
         <v-col cols="12">
           <v-checkbox
-            v-model="stateCheckbox.adminDisabled"
+            v-model="tempAdminDisabled"
             label="Desactivar el formulario de administrativo"
            
           ></v-checkbox>
@@ -54,13 +83,17 @@ function toggleCheckbox(type) {
               <p>http://localhost:5173/admin/list_contabilidad</p>
             </v-col>
             <v-col cols="3">
-              <v-btn prepend-icon="mdi-link-variant">Copiar</v-btn>
+              <v-btn 
+              color="primary"
+              prepend-icon="mdi-link-variant"
+              @click="copyToClipboard('http://localhost:5173/admin/list_contabilidad')"
+                >Copiar</v-btn>
             </v-col>
           </v-row>
         </v-col>
         <v-col cols="12">
           <v-checkbox
-            v-model="stateCheckbox.docenteDisabled"
+            v-model="tempDocenteDisabled"
             label="Desactivar el formulario de docentes"
           
           ></v-checkbox>
@@ -70,15 +103,27 @@ function toggleCheckbox(type) {
             
             </v-col>
             <v-col cols="3">
-              <v-btn prepend-icon="mdi-link-variant">Copiar</v-btn>
+              <v-btn prepend-icon="mdi-link-variant"
+              color="primary"
+              @click="copyToClipboard('http://localhost:5173/admin/list_contabilidad')"
+              >Copiar</v-btn>
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <v-row justify="center" class="mt-4">
-        <v-btn color="success" :disabled="!stateCheckbox.marketingDisabled && !stateCheckbox.adminDisabled && !stateCheckbox.docenteDisabled"> Guardar </v-btn>
+        <v-btn color="success" @click="guardarStates"> Guardar </v-btn>
       </v-row>
     </v-card-text>
+    <v-snackbar color="success" v-model="snackbar" :timeout="5000">
+      {{ snackbarMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
+
   </v-card>
 </template>
 

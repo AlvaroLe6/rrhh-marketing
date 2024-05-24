@@ -1,10 +1,12 @@
 <script setup>
+import { onMounted } from 'vue';
 import Footer from "@/views/Footer.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth";
 import UserProfile from "@/layouts/UserProfile.vue";
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import { useStateCheckbox } from '@/stores/stateCheckbox';
+
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -15,22 +17,25 @@ const items = [
       { title: "Docente", route:'nuevo-re-contabilidad'},
       { title: "Personal Administrativo", route:'nuevo-re-contabilidad'},
 ];
-
+onMounted(() => {
+  checkboxStore.buscarStates();
+});
 function redirectToView(route) {
   router.push({ name: route });
 }
 function isItemDisabled(title) {
   switch (title) {
     case "Asesor de Marketing":
-      return checkboxStore.marketingDisabled;
+      return !checkboxStore.marketingDisabled;
     case "Docente":
-      return checkboxStore.docenteDisabled;
+      return !checkboxStore.docenteDisabled;
     case "Personal Administrativo":
-      return checkboxStore.adminDisabled;
+      return !checkboxStore.adminDisabled;
     default:
       return false;
   }
 }
+
 </script>
   <template>
   <v-app>
@@ -72,7 +77,7 @@ function isItemDisabled(title) {
                   v-for="(item, index) in items"
                   :key="index"
                   @click="redirectToView(item.route)"
-                  :disabled="false"
+                  :disabled="isItemDisabled(item.title)"
                 >
                   <v-list-item-title
                   color="teal-lighten-3"

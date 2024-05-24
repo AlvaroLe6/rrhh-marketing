@@ -20,7 +20,7 @@
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vuefire": "^3.1.18",
-    "vuetify": "^3.6.6",
+    "vuetify": "^3.6.7",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
