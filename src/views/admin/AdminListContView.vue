@@ -116,18 +116,17 @@ const fasesDisponibles = [
 
 const registrosFiltrados = computed(() => {
   return contabilidadFecha.value.filter(registro => {
-    const faseMatch = !filtroFase.value || registro.fase === filtroFase.value;
+    const faseMatch = !filtroFase.value || registro.fase === filtroFase.value
     const fechaMatch =
       !rangoFecha.value.length ||
       (new Date(registro.fecha) >= new Date(rangoFecha.value[0]) &&
-        new Date(registro.fecha) <= new Date(rangoFecha.value[1]));
-    return faseMatch && fechaMatch;
-  });
-});
+        new Date(registro.fecha) <= new Date(rangoFecha.value[1]))
+    return faseMatch && fechaMatch
+  })
+})
 function aplicarFiltros() {
   // Este método se llama cuando se cambian los filtros
-  console.log('Aplicando filtros:',
-   { fase: filtroFase.value, rangoFecha: filtroRangoFecha.value });
+  console.log('Aplicando filtros:', { fase: filtroFase.value, rangoFecha: rangoFecha.value })
 }
 
 function limpiarFiltros() {
@@ -244,19 +243,17 @@ methods: {
           variant="outlined"
           @change="aplicarFiltros"
         ></v-text-field>
-<div class="d-flex justify-center">
-        <v-date-picker
+        <v-date-input
+            class="date-input-fecha"
             v-model="rangoFecha"
             label="Seleccionar rango de fechas"
             multiple="range"
             clearable
             variant="outlined"
             persistent-placeholder
-            max-width="368"
+            max-width="300px"
             @change="aplicarFiltros"
-          ></v-date-picker>
-</div>
-        
+          ></v-date-input>        
         <v-select
           class="select-fase"
           v-model="filtroFase"
@@ -457,13 +454,20 @@ methods: {
   display: flex;
   align-items: center;
   gap: 1rem;
+
 }
 .text-field-buscar,
-.text-field-fecha,
 .select-fase{
   max-width: 200px;
   width: 200px;
   height:40px;
+}
+.date-input-fecha
+{
+  max-width: 200px;
+  width: 200px;
+  height:40px;
+  
 }
 .checkbox-ver-detalles{
   max-width: 220px;

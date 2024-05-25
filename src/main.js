@@ -1,6 +1,7 @@
 
     import { createApp } from 'vue'
     import { createPinia } from 'pinia'
+    import { VDateInput } from 'vuetify/labs/VDateInput'
     import VueDatePicker from '@vuepic/vue-datepicker';
     import '@vuepic/vue-datepicker/dist/main.css'
 
@@ -27,8 +28,12 @@
         icons: {
           defaultSet: 'mdi', // Set de iconos por defecto
         },
-        components,
+        components: {
+          ...components,
+          VDateInput
+        },
         directives,
+
       });
     const app = createApp(App)
 
